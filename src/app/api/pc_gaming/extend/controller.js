@@ -31,7 +31,12 @@ export const extend_pc_gaming_session = async(data) => {
 		if (minutes <= 150) {
 			session_price = minutes;
 		} else {
-			session_price = 50 * hours;	
+			if (hours == 24) {
+				session_price = 500
+			}
+			else {
+				session_price = 50 * hours;
+			}
 		}
 
 		const request_data = {

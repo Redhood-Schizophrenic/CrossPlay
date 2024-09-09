@@ -2,7 +2,7 @@ import { pocketbase_url } from "@/app/constants/url_consts";
 import PocketBase from 'pocketbase';
 const pb = new PocketBase(pocketbase_url);
 
-export const add_pc_gaming_session = async(data) => {
+export const add_pc_gaming_session = async (data) => {
 
 	try {
 
@@ -24,6 +24,7 @@ export const add_pc_gaming_session = async(data) => {
 			};
 		}
 
+
 		// Supporting Values
 		const minutes = hours * 60;
 		let player_type;
@@ -35,11 +36,17 @@ export const add_pc_gaming_session = async(data) => {
 
 		let session_price;
 
+
 		// Session Price Calculator
 		if (minutes <= 150) {
 			session_price = minutes;
 		} else {
-			session_price = 50 * hours;	
+			if (hours == 24) {
+				session_price = 500
+			}
+			else {
+				session_price = 50 * hours;
+			}
 		}
 
 		const request_data = {
