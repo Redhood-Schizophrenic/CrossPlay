@@ -7,15 +7,13 @@ export const sales_dashboard = async () => {
 	try {
 		try {
 
-			const records = await pb.collection('Gaming_Sessions').getFullList({
-				sort: '-created',
-				expand: 'Device'
-			});
-
-			const devices = await pb.collection('Devices').getFullList();
-			devices.filter((device) => {
+			const records = await pb.collection('Gaming_Sessions').getFullList();
+			const devices_response = await fetch(`http://localhost:8090/api/collections/Devices/records`);
+			const devices = await devices_response.json();
+			// const devices = await pb.collection('Devices').getFullList();
+			devices.items.filter((device) => {
 				records.filter((record) => {
-					if (device.id = record.Device) {
+					if (device.id === record.Device) {
 						record.DeviceInfo = device
 					}
 				});
