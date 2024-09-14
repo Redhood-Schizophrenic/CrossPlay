@@ -44,7 +44,8 @@ export const extend_pc_gaming_session = async(data) => {
 			"Minutes": minutes,
 			"In_Time": in_time,
 			"Out_Time": out_time,
-			"Session_Price": session_price
+			"Session_Price": session_price,
+			"Status": "Extended"
 		};
 
 		try {

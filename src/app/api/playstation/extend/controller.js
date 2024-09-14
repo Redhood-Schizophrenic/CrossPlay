@@ -106,6 +106,7 @@ export const extend_playstation_session = async (data) => {
 			"In_Time": in_time,
 			"Out_Time": out_time,
 			"Session_Price": session_price,
+			"Status": "Extended"
 		};
 
 		try {
