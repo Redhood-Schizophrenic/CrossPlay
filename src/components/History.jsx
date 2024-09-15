@@ -39,7 +39,7 @@ export default function History() {
                 <th className="w-[350px] text-center p-2">Customer Name</th>
                 <th className="w-[200px] text-center p-2">Hours</th>
                 <th className="w-[200px] text-center p-2">Out Time</th>
-                <th className="w-[200px] text-center p-2">No. of Players</th>
+                <th className="w-[250px] text-center p-2">No. of Players</th>
                 <th className="w-[200px] text-center p-2">Session Price</th>
                 <th className="w-[200px] text-center p-2">Total Price</th>
                 <th className="w-[200px] text-center p-2">Snacks</th>
@@ -84,12 +84,11 @@ export default function History() {
                     </td>
                     <td className="w-[150px] text-center p-2">
                       <span
-                        className={`${
-                          session.Status === "Open" ||
-                          session.Status === "Extended"
+                        className={`${session.Status === "Open" ||
+                            session.Status === "Extended"
                             ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
                             : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
-                        } p-1 w-[110px] inline-block`}
+                          } p-1 w-[110px] inline-block`}
                       >
                         {session.Status}
                       </span>

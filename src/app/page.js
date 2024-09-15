@@ -6,12 +6,9 @@ export default async function Index() {
 
   // you can also fetch all records at once via getFullList
   return (
-    <>
+    <SectionWrapper>
       <Header />
-      < SectionWrapper >
-        <Session />
-      </SectionWrapper >
-    </>
-
+      <Session />
+    </SectionWrapper>
   );
 }

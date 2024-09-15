@@ -7,12 +7,9 @@ export default async function history() {
 
   // you can also fetch all records at once via getFullList
   return (
-    <>
+    < SectionWrapper >
       <Header />
-      < SectionWrapper >
-        <History />
-      </SectionWrapper >
-    </>
-
+      <History />
+    </SectionWrapper >
   );
 }

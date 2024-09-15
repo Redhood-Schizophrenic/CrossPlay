@@ -7,12 +7,9 @@ export default async function dashboard() {
 
   // you can also fetch all records at once via getFullList
   return (
-    <>
+    < SectionWrapper >
       <Header />
-      < SectionWrapper >
-        <Dashboard />
-      </SectionWrapper >
-    </>
-
+      <Dashboard />
+    </SectionWrapper >
   );
 }

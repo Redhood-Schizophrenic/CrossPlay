@@ -2,6 +2,7 @@
 
 import { api_url, pocketbase_url } from '@/app/constants/url_consts';
 import React, { useEffect, useState } from 'react';
+import AddDevices from './AddDevices';
 
 export default function Hero() {
 
@@ -21,6 +22,7 @@ export default function Hero() {
 	const [time, settime] = useState('00:00');
 	const [date, setDate] = useState('');
 	// const [openTime, setopenTime] = useState(false);
+	const [open1Modal, setopen1Modal] = useState(false);
 
 	const fetchCategory = async () => {
 		const res = await fetch(`${pocketbase_url}/api/collections/Devices_Type/records`);
@@ -51,6 +53,14 @@ export default function Hero() {
 
 	function ModalClose() {
 		setopenModal(false);
+	}
+
+	function Modal1Open() {
+		setopen1Modal(true);
+	}
+
+	function Modal1Close() {
+		setopen1Modal(false);
 	}
 
 	async function AddSession(e) {
@@ -104,20 +114,27 @@ export default function Hero() {
 	return (
 		<div className='flex flex-col justify-center items-center gap-8 p-6 text-lg'>
 			<div className='w-full h-auto'>
-				<div className='border-y-2 border-white py-4 text-center'>
+				<div className='flex justify-between items-center my-4 py-4'>
+					<p className='text-xl font-bold'>Devices</p>
+					<button onClick={Modal1Open} className='py-2 px-4 bg-green-500 active:bg-green-700 rounded-full'>Add device</button>
+				</div>
+				<div className='bg-slate-900 shadow-black shadow-md py-4 px-4 text-center flex justify-between items-center rounded-md'>
 					<h2>{category[0]?.Name}</h2>
 				</div>
-				<div className='p-4'>
+				<div className='p-4 flex items-center gap-8 flex-wrap'>
 					{
 						ps.map((items, index) => {
 							return (
-								<div
-									title={items.Description}
-									key={index}
-									onClick={() => { setdevice_id(items.id); ModalOpen(); }}
-									className='w-[200px] h-[200px] border-2 border-white rounded-md inline-flex justify-center items-center m-4 cursor-pointer'
-								>
-									<span className='font-semibold cursor-pointer'>{items.Name}</span>
+								<div className='flex-col flex justify-between items-center'>
+									<div
+										title={items.Description}
+										key={index}
+										onClick={() => { setdevice_id(items.id); ModalOpen(); }}
+										className='w-[200px] h-[200px] bg-slate-900 shadow-black shadow-md rounded-md inline-flex justify-center items-center m-4 cursor-pointer flex-col gap-10'
+									>
+										<span className='font-semibold cursor-pointer'>{items.Name}</span>
+									</div>
+									<button className='p-2 px-4 bg-slate-800 active:bg-slate-900 rounded-md'>update</button>
 								</div>
 							)
 						})
@@ -125,20 +142,23 @@ export default function Hero() {
 				</div>
 			</div>
 			<div className='w-full h-auto'>
-				<div className='border-y-2 border-white py-4 text-center'>
+				<div className='bg-slate-900 shadow-black shadow-md py-4 px-4 text-center flex justify-between items-center rounded-md'>
 					<h2>{category[1]?.Name}</h2>
 				</div>
-				<div className='p-4'>
+				<div className='p-4 flex items-center gap-8 flex-wrap'>
 					{
 						pg.map((items, index) => {
 							return (
-								<div
-									title={items.Description}
-									key={index}
-									onClick={() => { setdevice_id(items.id); ModalOpen(); }}
-									className='w-[200px] h-[200px] border-2 border-white rounded-md inline-flex justify-center items-center m-4 cursor-pointer'
-								>
-									<span className='font-semibold cursor-pointer'>{items.Name}</span>
+								<div className='flex-col flex justify-between items-center'>
+									<div
+										title={items.Description}
+										key={index}
+										onClick={() => { setdevice_id(items.id); ModalOpen(); }}
+										className='w-[200px] h-[200px] bg-slate-900 shadow-black shadow-md rounded-md inline-flex justify-center items-center m-4 cursor-pointer'
+									>
+										<span className='font-semibold cursor-pointer'>{items.Name}</span>
+									</div>
+									<button className='p-2 px-4 bg-slate-800 active:bg-slate-900 rounded-md'>update</button>
 								</div>
 							)
 						})
@@ -157,7 +177,7 @@ export default function Hero() {
 									</div>
 									<div className='w-full inline-flex flex-col justify-center items-start'>
 										<label>Customer number</label>
-										<input type="text" minLength={10} maxLength={10}  value={customer_number} onChange={(e) => { setcustomer_number(e.target.value) }} className='w-full text-lg text-black p-2 rounded-lg' />
+										<input type="text" minLength={10} maxLength={10} value={customer_number} onChange={(e) => { setcustomer_number(e.target.value) }} className='w-full text-lg text-black p-2 rounded-lg' />
 									</div>
 									<div className='w-full inline-flex flex-col justify-center items-start'>
 										<label>Date</label>
@@ -193,6 +213,11 @@ export default function Hero() {
 							</div>
 						</form>
 					</div>
+				)
+			}
+			{
+				open1Modal && (
+					<AddDevices handleClose={Modal1Close} devices={fetchDevices} />
 				)
 			}
 		</div>

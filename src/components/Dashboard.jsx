@@ -26,9 +26,9 @@ export default function Dashboard() {
     setsession(data1.items);
     const total_sales = data1?.items?.length;
     setTotalSales(total_sales);
-    const closed_sessions = data1?.items?.filter((session)=> session.Status === "Closed");
+    const closed_sessions = data1?.items?.filter((session) => session.Status === "Closed");
     setClosedSession(closed_sessions.length);
-    const open_sessions = data1?.items?.filter((session)=> session.Status === "Open");
+    const open_sessions = data1?.items?.filter((session) => session.Status === "Open");
     setOpenSession(open_sessions.length);
     // const extended_sessions = data1?.items?.filter((session)=> session.Status === "Extended");
     // setExtendedSession(extended_sessions.length);
@@ -36,7 +36,7 @@ export default function Dashboard() {
     // setExtendedSession(extended_sessions.length);
     // const extended_sessions = data1?.items?.filter((session)=> session.Status === "Extended");
     // setExtendedSession(extended_sessions.length);
-    
+
 
     const result = await fetch(
       `${pocketbase_url}/api/collections/Devices/records`
@@ -50,13 +50,13 @@ export default function Dashboard() {
       <div>
 
       </div>
-      <div className = "p-4 bg-slate-800 h-auto" >
+      <div className="p-4 h-auto" >
         <div className="flex justify-start items-center">
           <h2 className="text-xl font-bold mx-4"> Sessions Data </h2>
         </div>
         <div className="p-4 overflow-x-scroll w-dvw">
           <div className="w-full">
-            <table className="min-w-[1440px] mx-auto bg-slate-900 text-lg my-4 border-none">
+            <table className="min-w-[1440px] mx-auto text-lg my-4 border-none">
               <thead>
                 <tr className="bg-slate-800 text-white">
                   <th className="w-[350px] text-center p-2">Date</th>
@@ -105,12 +105,11 @@ export default function Dashboard() {
                     </td>
                     <td className="w-[150px] text-center p-2">
                       <span
-                        className={`${
-                          session.Status === "Open" ||
+                        className={`${session.Status === "Open" ||
                           session.Status === "Extended"
-                            ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
-                            : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
-                        } p-1 w-[110px] inline-block`}
+                          ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
+                          : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                          } p-1 w-[110px] inline-block`}
                       >
                         {session.Status}
                       </span>

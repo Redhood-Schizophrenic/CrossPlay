@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 export default function Session() {
   const [devices, setdevices] = useState([]);
   const [sessions, setsession] = useState([]);
+  const [openDrop, setopenDrop] = useState(false);
 
   useEffect(() => {
     fetchDevice();
@@ -37,7 +38,7 @@ export default function Session() {
           }),
         });
         if (response.ok) {
-			await fetchDevice()
+          await fetchDevice()
         }
       } else if (device[0].Category == "z5vqy5vnmzpour0") {
         const response = await fetch(`${api_url}/api/playstation/close`, {
@@ -50,12 +51,16 @@ export default function Session() {
           }),
         });
         if (response.ok) {
-			await fetchDevice();
+          await fetchDevice();
         }
       }
     } catch (error) {
       throw console.error(error);
     }
+  }
+
+  function handleDrop() {
+    setopenDrop(!openDrop);
   }
 
   return (
@@ -68,8 +73,8 @@ export default function Session() {
           </button>
         </a>
       </div>
-      <div className="p-4 overflow-x-scroll w-dvw">
-        <div className="w-full">
+      <div className="p-4 w-full lg:overflow-x-scroll lg:w-dvw">
+        <div className="w-full hidden lg:block">
           <table className="min-w-[1440px] mx-auto bg-slate-900 text-lg my-4 border-none">
             <thead>
               <tr className="bg-slate-800 text-white">
@@ -78,9 +83,9 @@ export default function Session() {
                 <th className="w-[350px] text-center p-2">Customer Name</th>
                 <th className="w-[200px] text-center p-2">Hours</th>
                 <th className="w-[200px] text-center p-2">Out Time</th>
-                <th className="w-[200px] text-center p-2">No. of Players</th>
-                <th className="w-[200px] text-center p-2">Session Price</th>
-                <th className="w-[200px] text-center p-2">Total Price</th>
+                <th className="w-[300px] text-center p-2">No. of Players</th>
+                <th className="w-[300px] text-center p-2">Session Price</th>
+                <th className="w-[300px] text-center p-2">Total Price</th>
                 <th className="w-[200px] text-center p-2">Snacks</th>
                 <th className="w-[150px] text-center p-2">Status</th>
                 <th className="w-[200px] text-center p-2">Actions</th>
@@ -93,7 +98,7 @@ export default function Session() {
               .map((session, index) => (
                 <tbody key={index}>
                   <tr className="text-white border-b border-slate-700">
-                    <td className="w-[350px] text-center p-2">
+                    <td className="w-[400px] text-center p-2">
                       {session.Date}
                     </td>
                     <td className="w-[200px] text-center p-2">
@@ -124,12 +129,11 @@ export default function Session() {
                     </td>
                     <td className="w-[150px] text-center p-2">
                       <span
-                        className={`${
-                          session.Status === "Open" ||
+                        className={`${session.Status === "Open" ||
                           session.Status === "Extended"
-                            ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
-                            : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
-                        } p-1 w-[110px] inline-block`}
+                          ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
+                          : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                          } p-1 w-[110px] inline-block`}
                       >
                         {session.Status}
                       </span>
@@ -142,6 +146,7 @@ export default function Session() {
                             (device) => device.id === session.Device
                           );
                           handleCloseSession(device_id, session.id);
+                          alert('Session is Closed');
                         }}
                         className="text-lg addsession-btn active:bg-slate-900 w-[150px] bg-slate-700 p-1 rounded-full"
                       >
@@ -152,6 +157,103 @@ export default function Session() {
                 </tbody>
               ))}
           </table>
+        </div>
+
+        <div className="w-full block lg:hidden mt-6">
+          <div className="bg-gradient-to-r w-full from-gray-800 to-gray-900 text-white p-6 rounded-lg shadow-lg mb-6 relative">
+            {sessions
+              .filter(
+                (ses) => ses.Status === "Extended" || ses.Status === "Open"
+              )
+              .map((session, index) => (
+                <div key={index}>
+                  <button
+                    onClick={() => {
+                      const device_id = devices.filter(
+                        (device) => device.id === session.Device
+                      );
+                      handleCloseSession(device_id, session.id);
+                      alert('Session is Closed');
+                    }}
+                    className="absolute top-4 right-4 bg-slate-500 active:bg-slate-600 border-2 border-slate-500 text-white font-semibold px-3 py-1 rounded-full shadow-md">Close Session</button>
+
+                  <div className="text-left absolute top-4 left-4 inline-flex items-center gap-4">
+                    <p className="text-sm text-gray-400">Status</p>
+                    <span
+                      className={`${session.Status === "Open" ||
+                        session.Status === "Extended"
+                        ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
+                        : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                        } p-1 w-auto text-center px-4 inline-block`}
+                    >{session.Status}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center mb-4 mt-10">
+                    <div className="text-left">
+                      <p className="text-sm text-gray-400">Date</p>
+                      <p className="text-lg font-semibold">{session.Date}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-400">Device</p>
+                      <p className="text-lg font-semibold">
+                        {devices
+                          .filter((device) => device.id === session.Device)
+                          .map((items) => items.Name)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="text-left">
+                      <p className="text-sm text-gray-400">Customer</p>
+                      <p className="text-lg font-semibold">{session.Customer_Name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-400">Out Time</p>
+                      <p className="text-lg font-semibold">{session.Out_Time}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => { handleDrop(); }} className={`text-lg w-full bg-transparent my-[-10px] p-2 rounded-full`}>
+                    <i class="fa-solid fa-angle-down"></i>
+                    <span>more</span>
+                  </button>
+                  {
+                    openDrop && (
+                      <>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="text-left">
+                            <p className="text-sm text-gray-400">No. of Players</p>
+                            <p className="text-lg font-semibold">{session.No_of_Players}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-400">Hours</p>
+                            <p className="text-lg font-semibold">{session.Hours}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="text-left">
+                            <p className="text-sm text-gray-400">Session Price</p>
+                            <p className="text-lg font-semibold">₹{session.Session_Price}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-400">Total Price</p>
+                            <p className="text-lg font-semibold">₹{session.Total_Price}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="text-left">
+                            <p className="text-sm text-gray-400">Snacks</p>
+                            <p className="text-lg font-semibold">{session.Snacks}</p>
+                          </div>
+                        </div>
+                      </>
+                    )
+                  }
+                </div>
+              ))}
+          </div>
         </div>
       </div>
     </div>
