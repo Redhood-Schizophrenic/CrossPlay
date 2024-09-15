@@ -19,7 +19,12 @@ export const extend_playstation_session = async (data) => {
 			};
 		}
 
+		const session_url = `${pocketbase_url}/api/collections/Gaming_Sessions/records/${session_id}`
+		console.log(session_url);
+		const test = await fetch(session_url)
+		console.log(test)
 		const record = await pb.collection('Gaming_Sessions').getOne(session_id);
+		console.log(record)
 		const date = record.Date;
 		const no_of_players = record.No_of_Player;
 		const player_type = record.Player_Type;

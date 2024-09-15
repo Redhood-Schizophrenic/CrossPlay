@@ -30,11 +30,8 @@ export default function Session() {
     setdevices(data.items);
   }
 
-  async function handleExtendSession(device, sessionid) {
+  async function handleExtendSession(device, session_id) {
     try {
-      
-      const min = parseInt(minutes)
-      console.log(device);
       if (device[0].Category == "oqhutmwzbqih6a3") {
         const response = await fetch(`${api_url}/api/pc_gaming/extend`, {
           method: "PUT",
@@ -42,7 +39,7 @@ export default function Session() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            "session_id": sessionid,
+            session_id,
             minutes,
             in_time,
             out_time
@@ -58,14 +55,13 @@ export default function Session() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            "session_id": sessionid,
+            session_id,
             minutes,
             in_time,
             out_time
           }),
         });
         if (response.ok) {
-          alert(await response.json())
           await fetchDevice();
         }
       }
@@ -108,39 +104,39 @@ export default function Session() {
     }
   }
 
-  // async function handleExtendSession(device) {
-  //   try {
-  //     if (device[0].Category == "oqhutmwzbqih6a3") {
-  //       const response = await fetch(`${api_url}/api/pc_gaming/close`, {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           session_id,
-  //         }),
-  //       });
-  //       if (response.ok) {
-  //         await fetchDevice()
-  //       }
-  //     } else if (device[0].Category == "z5vqy5vnmzpour0") {
-  //       const response = await fetch(`${api_url}/api/playstation/close`, {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           session_id,
-  //         }),
-  //       });
-  //       if (response.ok) {
-  //         await fetchDevice();
-  //       }
-  //     }
-  //   } catch (error) {
-  //     throw console.error(error);
-  //   }
-  // }
+  async function handleExtendSession(device) {
+    try {
+      if (device[0].Category == "oqhutmwzbqih6a3") {
+        const response = await fetch(`${api_url}/api/pc_gaming/close`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            session_id,
+          }),
+        });
+        if (response.ok) {
+          await fetchDevice()
+        }
+      } else if (device[0].Category == "z5vqy5vnmzpour0") {
+        const response = await fetch(`${api_url}/api/playstation/close`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            session_id,
+          }),
+        });
+        if (response.ok) {
+          await fetchDevice();
+        }
+      }
+    } catch (error) {
+      throw console.error(error);
+    }
+  }
 
 
   function handleDrop() {
@@ -149,12 +145,11 @@ export default function Session() {
 
   function handleExtend(id) {
     setOpenExtend(!openExtend);
-    setsession_id(id);
     console.log(id)
   }
 
 
-  console.log(session_id)
+  console.log()
 
   return (
     <div className="text-white p-4">
@@ -175,7 +170,6 @@ export default function Session() {
                 <th className="w-[250px] text-center p-2">Device</th>
                 <th className="w-[350px] text-center p-2">Customer Name</th>
                 <th className="w-[200px] text-center p-2">Hours</th>
-                <th className="w-[200px] text-center p-2">In Time</th>
                 <th className="w-[200px] text-center p-2">Out Time</th>
                 <th className="w-[300px] text-center p-2">No. of Players</th>
                 <th className="w-[300px] text-center p-2">Session Price</th>
@@ -207,9 +201,6 @@ export default function Session() {
                       {session.Hours}
                     </td>
                     <td className="w-[200px] text-center p-2">
-                      {session.In_Time}
-                    </td>
-                    <td className="w-[200px] text-center p-2">
                       {session.Out_Time}
                     </td>
                     <td className="w-[200px] text-center p-2">
@@ -238,9 +229,8 @@ export default function Session() {
                     <td className="text-2xl flex items-center gap-6 p-2 ml-10">
                       <button
                         onClick={() => {
-                          handleExtend(session.id);
+                          handleExtend();
                           sessionStorage.setItem("session_id", session.id)
-                          sessionStorage.setItem("session_device", session.Device)
                           console.log(session.id)
                         }}
                         className="text-lg addsession-btn active:bg-slate-900 w-[150px] bg-slate-700 p-1 rounded-full"
@@ -339,12 +329,11 @@ export default function Session() {
                     <button
                       type="submit"
                       onClick={() => {
-                        console.log("Session", session_id)
-                        const deviceid = sessionStorage.getItem('session_device')
+                        console.log("Session", session)
                         const device_id = devices.filter(
-                          (device) => device.id === deviceid
+                          (device) => device.id === session.Device
                         );
-                        handleExtendSession(device_id, session_id);
+                        handleExtendSession(device_id, session.id);
                         alert('Session is Extended');
                       }}
                       className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -382,7 +371,7 @@ export default function Session() {
                     handleExtend();
                   }}
                   className="absolute top-4 right-1/2 bg-slate-500 active:bg-slate-600 border-2 border-slate-500 text-white font-semibold px-3 py-1 rounded-full shadow-md">
-                  <i className="fa-solid fa-pen-to-square"></i>
+                  <i class="fa-solid fa-pen-to-square"></i>
                 </button>
 
                 <div className="text-left absolute top-4 left-4 inline-flex items-center gap-4">
@@ -422,7 +411,7 @@ export default function Session() {
                   </div>
                 </div>
                 <button onClick={() => { handleDrop(); }} className={`text-lg w-full bg-transparent my-[-10px] p-2 rounded-full`}>
-                  <i className="fa-solid fa-angle-down"></i>
+                  <i class="fa-solid fa-angle-down"></i>
                   <span>more</span>
                 </button>
                 {

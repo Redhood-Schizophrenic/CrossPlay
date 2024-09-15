@@ -125,7 +125,7 @@ export default function Hero() {
 					{
 						ps.map((items, index) => {
 							return (
-								<div className='flex-col flex justify-between items-center'>
+								<div key={index} className='flex-col flex justify-between items-center'>
 									<div
 										title={items.Description}
 										key={index}
@@ -149,7 +149,7 @@ export default function Hero() {
 					{
 						pg.map((items, index) => {
 							return (
-								<div className='flex-col flex justify-between items-center'>
+								<div key={index} className='flex-col flex justify-between items-center'>
 									<div
 										title={items.Description}
 										key={index}
