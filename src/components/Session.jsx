@@ -56,8 +56,8 @@ export default function Session() {
         },
         body: JSON.stringify({
           "session_id": sessionid,
-          "customer_name": sessionJson.Customer_Contact,
-          "customer_contact": sessionJson.Customer_Name,
+          "customer_name": sessionJson.Customer_Name,
+          "customer_contact": sessionJson.Customer_Contact,
           "device_id": sessionJson.Device,
           "date": sessionJson.Date,
           "hours": parseInt(sessionJson.Hours),
@@ -70,8 +70,6 @@ export default function Session() {
           "total_price": parseInt(sessionJson.Total_Price),
         }),
       });
-      const data = await response.json();
-      console.log("Snacks:- ", data);
       if (response.ok) {
         alert("Snacks Added");
         handleSnacksPopup();
@@ -100,7 +98,9 @@ export default function Session() {
           }),
         });
         if (response.ok) {
-          await fetchDevice()
+          alert("Session Extended");
+          handleExtendPopup();
+          await fetchDevice();
         }
       } else if (device[0].Category === playstation_id) {
         const response = await fetch(`${api_url}/api/playstation/extend`, {
@@ -260,7 +260,7 @@ export default function Session() {
                       ₹ {session.Total_Price}
                     </td>
                     <td className="w-[200px] text-center p-2">
-                      {session.Snacks}
+                      ₹  {session.Snacks}
                     </td>
                     <td className="w-[150px] text-center p-2">
                       <span
@@ -276,6 +276,7 @@ export default function Session() {
                       <button
                         onClick={() => {
                           sessionStorage.setItem("session_id", session.id)
+                          sessionStorage.setItem("session_device", session.Device)
                           handleSnacks(session.id, session);
                         }}
                         className=" text-2xl addsession-btn active:bg-slate-900 bg-yellow-700 py-2 px-4 rounded-lg"
@@ -314,6 +315,7 @@ export default function Session() {
             openSnacks && (
               <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+                  <h1 className="text-black text-xl"> Add Snacks </h1>
                   <button
                     onClick={handleSnacksPopup}
                     className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
@@ -367,6 +369,7 @@ export default function Session() {
             openExtend && (
               <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+                  <h1 className="text-black text-xl"> Extend Session </h1>
                   <button
                     onClick={handleExtendPopup}
                     className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
@@ -448,7 +451,6 @@ export default function Session() {
                           (device) => device.id === deviceid
                         );
                         handleExtendSession(device_id, session_id);
-                        alert('Session is Extended');
                       }}
                       className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
@@ -471,34 +473,66 @@ export default function Session() {
             )
             .map((session, index) => (
               <div key={index} className="bg-gradient-to-r w-full from-gray-800 to-gray-900 text-white p-6 rounded-lg shadow-lg mb-6 relative">
-                <div key={index}>
-                  <button
-                    onClick={() => {
-                      const device_id = devices.filter(
-                        (device) => device.id === session.Device
-                      );
-                      handleCloseSession(device_id, session.id);
-                    }}
-                    className="absolute top-4 right-4 bg-slate-500 active:bg-slate-600 border-2 border-slate-500 text-white font-semibold px-3 py-1 rounded-full shadow-md">Close Session</button>
+                <div key={index} className="flex flex-col gap-4">
 
-                  <button
-                    onClick={() => {
-                      handleExtend(session.id, session);
-                    }}
-                    className="absolute top-4 right-1/2 bg-slate-500 active:bg-slate-600 border-2 border-slate-500 text-white font-semibold px-3 py-1 rounded-full shadow-md">
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </button>
+                  <div className="flex justify-between p-2">
+                    <div className="flex justify-between w-full">
+                      <div className="w-1/2 flex justify-between">
+                        <button
+                          onClick={() => {
+                            sessionStorage.setItem("session_id", session.id)
+                            sessionStorage.setItem("session_device", session.Device)
+                            handleSnacks(session.id, session);
+                          }}
+                          className=" text-2xl addsession-btn active:bg-slate-900 bg-yellow-700 py-2 px-4 rounded-lg"
+                        >
+                          <i className="fa-solid fa-utensils"></i>
+                        </button>
 
-                  <div className="text-left absolute top-4 left-4 inline-flex items-center gap-4">
+                        <button
+                          onClick={() => {
+                            sessionStorage.setItem("session_id", session.id)
+                            sessionStorage.setItem("session_device", session.Device)
+                            handleExtend(session.id, session);
+                          }}
+                          className="text-2xl addsession-btn active:bg-slate-900 bg-slate-700 py-2 px-4 rounded-lg"
+                        >
+                          <i className="fa-solid fa-plus"></i>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const device_id = devices.filter(
+                              (device) => device.id === session.Device
+                            );
+                            handleCloseSession(device_id, session.id);
+                          }}
+                          className="text-2xl addsession-btn active:bg-slate-900 bg-green-700 py-2 px-4 rounded-lg"
+                        >
+                          <i className="fa-solid fa-square-check"></i>
+                        </button>
+                      </div>
+
+                      <div className="w-1/2 flex justify-end">
+                        <button onClick={() => { handleDrop(); }} className={`text-lg bg-transparent rounded-full`}>
+                          <i className="fa-solid fa-expand"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex w-full justify-center items-center gap-4 pt-10">
                     <p className="text-sm text-gray-400">Status</p>
                     <span
-                      className={`${session.Status === "Open" ||
-                        session.Status === "Extended"
+                      className={`${session.Status === "Open"
                         ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
-                        : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                        : session.Status === "Extended"
+                          ? "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                          : "bg-gray-800 text-white rounded-full bg-opacity-50 border-2 border-gray-500 font-semibold"
                         } p-1 w-auto text-center px-4 inline-block`}
                     >{session.Status}</span>
                   </div>
+
 
                   <div className="flex justify-between items-center mb-4 mt-10">
                     <div className="text-left">
@@ -525,10 +559,6 @@ export default function Session() {
                       <p className="text-lg font-semibold">{session.Out_Time}</p>
                     </div>
                   </div>
-                  <button onClick={() => { handleDrop(); }} className={`text-lg w-full bg-transparent my-[-10px] p-2 rounded-full`}>
-                    <i className="fa-solid fa-angle-down"></i>
-                    <span>more</span>
-                  </button>
                   {
                     openDrop && (
                       <>
@@ -557,23 +587,78 @@ export default function Session() {
                         <div className="flex justify-between items-center mb-4">
                           <div className="text-left">
                             <p className="text-sm text-gray-400">Snacks</p>
-                            <p className="text-lg font-semibold">{session.Snacks}</p>
+                            <p className="text-lg font-semibold">₹{session.Snacks}</p>
                           </div>
                         </div>
                       </>
                     )
                   }
                   {
+                    openSnacks && (
+                      <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+                          <h1 className="text-black text-xl"> Add Snacks </h1>
+                          <button
+                            onClick={handleSnacksPopup}
+                            className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
+                          >
+                            X
+                          </button>
+                          <h2 className="text-lg mb-4">Extend Session</h2>
+                          <form onSubmit={(e) => {
+                            e.preventDefault();
+                            console.log("Session", session_id)
+                            const deviceid = sessionStorage.getItem('session_device')
+                            const device_id = devices.filter(
+                              (device) => device.id === deviceid
+                            );
+                            handleSnacksUpdate(device_id, session_id);
+                          }}
+                          >
+                            <div className="mb-4">
+                              <label
+                                className="block text-gray-700 text-sm font-bold mb-2"
+                                htmlFor="snacks"
+                              >
+                                Snacks (Rs.)
+                              </label>
+                              <input
+                                type="text"
+                                value={snacks}
+                                onChange={
+                                  (e) => {
+                                    setsnacks(e.target.value);
+                                  }
+                                }
+                                id="snacks"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required
+                              />
+                            </div>
+
+                            <button
+                              type="submit"
+                              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                              Add Snacks
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    )
+                  }
+                  {
                     openExtend && (
                       <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+                          <h1 className="text-black text-xl"> Extend Session </h1>
                           <button
                             onClick={handleExtendPopup}
                             className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
                           >
                             X
                           </button>
-                          <h2 className="text-lg text-black mb-4">Extend Session</h2>
+                          <h2 className="text-lg mb-4">Extend Session</h2>
                           <form >
                             <div className="mb-4">
                               <label
@@ -582,9 +667,7 @@ export default function Session() {
                               >
                                 Minutes
                               </label>
-                              <input
-                                type="text"
-                                id="minutes"
+                              <select
                                 value={minutes}
                                 onChange={
                                   (e) => {
@@ -593,7 +676,12 @@ export default function Session() {
                                 }
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 required
-                              />
+                              >
+                                <option value="">-- Select -- </option>
+                                <option value="15">15 Minutes</option>
+                                <option value="30">30 Minutes</option>
+                                <option value="60">60 Minutes</option>
+                              </select>
                             </div>
                             <div className="mb-4">
                               <label
@@ -638,6 +726,15 @@ export default function Session() {
 
                             <button
                               type="submit"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                console.log("Session", session_id)
+                                const deviceid = sessionStorage.getItem('session_device')
+                                const device_id = devices.filter(
+                                  (device) => device.id === deviceid
+                                );
+                                handleExtendSession(device_id, session_id);
+                              }}
                               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             >
                               Extend
