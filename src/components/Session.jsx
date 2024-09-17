@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 export default function Session() {
   const [devices, setdevices] = useState([]);
   const [sessions, setsession] = useState([]);
-  const [openDrop, setopenDrop] = useState(false);
+  const [openDrop, setopenDrop] = useState(null);
   const [openExtend, setOpenExtend] = useState(false);
   const [openSnacks, setOpenSnacks] = useState(false);
   const [minutes, setminutes] = useState('');
@@ -15,8 +15,11 @@ export default function Session() {
   const [in_time, setin_time] = useState("")
   const [snacks, setsnacks] = useState('');
   const [sessionJson, setSessionJson] = useState({})
+  const [Pc_category_id, setPc_category_id] = useState('');
+  const [Ps_category_id, setPs_category_id] = useState('');
 
   useEffect(() => {
+    fetchCategory();
     fetchDevice();
   }, []);
 
@@ -33,18 +36,32 @@ export default function Session() {
     setdevices(data.items);
   }
 
-  const pc_gaming_id = "oqhutmwzbqih6a3";
-  const playstation_id = "z5vqy5vnmzpour0";
+  console.log(devices)
 
+  // const pc_gaming_id = "oqhutmwzbqih6a3";
+  // const playstation_id = "z5vqy5vnmzpour0";
+
+  async function fetchCategory() {
+    try {
+      const res = await fetch(`${pocketbase_url}/api/collections/Devices_Type/records`);
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        setPc_category_id(data?.items[1].id);
+        setPs_category_id(data?.items[0].id);
+      }
+    } catch (error) {
+      throw console.error(error);
+    }
+  }
 
   async function handleSnacksUpdate(device, sessionid) {
     try {
-
       let url_call;
-      if (device[0].Category === pc_gaming_id) {
+      if (device[0].Category === Pc_category_id) {
         url_call = `${api_url}/api/pc_gaming/update`;
       }
-      else if (device[0].Category === playstation_id) {
+      else if (device[0].Category === Ps_category_id) {
         url_call = `${api_url}/api/playstation/update`;
       }
       console.log('URL', url_call);
@@ -83,8 +100,7 @@ export default function Session() {
 
   async function handleExtendSession(device, sessionid) {
     try {
-
-      if (device[0].Category === pc_gaming_id) {
+      if (device[0].Category === Pc_category_id) {
         const response = await fetch(`${api_url}/api/pc_gaming/extend`, {
           method: "PUT",
           headers: {
@@ -102,7 +118,7 @@ export default function Session() {
           handleExtendPopup();
           await fetchDevice();
         }
-      } else if (device[0].Category === playstation_id) {
+      } else if (device[0].Category === Ps_category_id) {
         const response = await fetch(`${api_url}/api/playstation/extend`, {
           method: "PUT",
           headers: {
@@ -117,6 +133,7 @@ export default function Session() {
         });
         if (response.ok) {
           alert("Session Extended!!!");
+          handleExtendPopup();
           await fetchDevice();
         }
       }
@@ -127,9 +144,10 @@ export default function Session() {
 
   async function handleCloseSession(device, session_id) {
     const check = confirm("Close Session?");
+    // console.log(check)
     if (check) {
       try {
-        if (device[0].Category === pc_gaming_id) {
+        if (device[0].Category === Pc_category_id) {
           const response = await fetch(`${api_url}/api/pc_gaming/close`, {
             method: "PUT",
             headers: {
@@ -140,10 +158,11 @@ export default function Session() {
             }),
           });
           if (response.ok) {
+            console.log("Running pc")
             alert("Session Closed.");
             await fetchDevice()
           }
-        } else if (device[0].Category === playstation_id) {
+        } else if (device[0].Category === Ps_category_id) {
           const response = await fetch(`${api_url}/api/playstation/close`, {
             method: "PUT",
             headers: {
@@ -154,6 +173,7 @@ export default function Session() {
             }),
           });
           if (response.ok) {
+            console.log("Running PS")
             await fetchDevice();
           }
         }
@@ -164,8 +184,8 @@ export default function Session() {
 
   }
 
-  function handleDrop() {
-    setopenDrop(!openDrop);
+  function handleDrop(sessionId) {
+    setopenDrop(openDrop === sessionId ? null : sessionId);
   }
 
   function handleExtendPopup() {
@@ -196,7 +216,7 @@ export default function Session() {
 
   return (
     <div className="text-white p-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-col gap-6 sm:flex-row">
         <h2 className="text-xl font-bold mx-4">Latest Sessions</h2>
         <a href="/addsession">
           <button className="bg-green-500 addsession-btn active:bg-green-700 font-bold text-lg px-4 py-2 rounded-full">
@@ -286,8 +306,6 @@ export default function Session() {
 
                       <button
                         onClick={() => {
-                          sessionStorage.setItem("session_id", session.id)
-                          sessionStorage.setItem("session_device", session.Device)
                           handleExtend(session.id, session);
                         }}
                         className="text-2xl addsession-btn active:bg-slate-900 bg-slate-700 py-2 px-4 rounded-lg"
@@ -311,161 +329,11 @@ export default function Session() {
                 </tbody>
               ))}
           </table>
-          {
-            openSnacks && (
-              <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
-                  <h1 className="text-black text-xl"> Add Snacks </h1>
-                  <button
-                    onClick={handleSnacksPopup}
-                    className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
-                  >
-                    X
-                  </button>
-                  <h2 className="text-lg mb-4">Extend Session</h2>
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log("Session", session_id)
-                    const deviceid = sessionStorage.getItem('session_device')
-                    const device_id = devices.filter(
-                      (device) => device.id === deviceid
-                    );
-                    handleSnacksUpdate(device_id, session_id);
-                  }}
-                  >
-                    <div className="mb-4">
-                      <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="snacks"
-                      >
-                        Snacks (Rs.)
-                      </label>
-                      <input
-                        type="text"
-                        value={snacks}
-                        onChange={
-                          (e) => {
-                            setsnacks(e.target.value);
-                          }
-                        }
-                        id="snacks"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    >
-                      Add Snacks
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )
-          }
-          {
-            openExtend && (
-              <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
-                  <h1 className="text-black text-xl"> Extend Session </h1>
-                  <button
-                    onClick={handleExtendPopup}
-                    className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
-                  >
-                    X
-                  </button>
-                  <h2 className="text-lg mb-4">Extend Session</h2>
-                  <form >
-                    <div className="mb-4">
-                      <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="minutes"
-                      >
-                        Minutes
-                      </label>
-                      <select
-                        value={minutes}
-                        onChange={
-                          (e) => {
-                            setminutes(e.target.value);
-                          }
-                        }
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                      >
-                        <option value="">-- Select -- </option>
-                        <option value="15">15 Minutes</option>
-                        <option value="30">30 Minutes</option>
-                        <option value="60">60 Minutes</option>
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="in_time"
-                      >
-                        In Time
-                      </label>
-                      <input
-                        type="time"
-                        value={in_time}
-                        onChange={
-                          (e) => {
-                            setin_time(e.target.value);
-                          }
-                        }
-                        id="in_time"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="out_time"
-                      >
-                        Out Time
-                      </label>
-                      <input
-                        type="time"
-                        value={out_time}
-                        onChange={
-                          (e) => {
-                            setout_time(e.target.value);
-                          }
-                        }
-                        id="out_time"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      onClick={() => {
-                        console.log("Session", session_id)
-                        const deviceid = sessionStorage.getItem('session_device')
-                        const device_id = devices.filter(
-                          (device) => device.id === deviceid
-                        );
-                        handleExtendSession(device_id, session_id);
-                      }}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    >
-                      Extend
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )
-          }
         </div>
       </div>
 
       {/* For Smaller Screens */}
-      <div className="w-full block lg:hidden mt-6">
+      <div className="w-full block lg:hidden">
         {
           sessions
             .filter(
@@ -476,8 +344,19 @@ export default function Session() {
                 <div key={index} className="flex flex-col gap-4">
 
                   <div className="flex justify-between p-2">
-                    <div className="flex justify-between w-full">
-                      <div className="w-1/2 flex justify-between">
+                    <div className="flex justify-between flex-col gap-8 sm:gap-0 sm:flex-row w-full">
+                      <div className="flex w-full justify-start items-center gap-4 pr-0 sm:pr-8">
+                        <p className="text-lg font-semibold text-white">Status</p>
+                        <span
+                          className={`${session.Status === "Open"
+                            ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
+                            : session.Status === "Extended"
+                              ? "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                              : "bg-gray-800 text-white rounded-full bg-opacity-50 border-2 border-gray-500 font-semibold"
+                            } py-2 w-full text-lg text-center px-4 inline-block`}
+                        >{session.Status}</span>
+                      </div>
+                      <div className="w-full sm:w-1/2 flex justify-between">
                         <button
                           onClick={() => {
                             sessionStorage.setItem("session_id", session.id)
@@ -491,8 +370,6 @@ export default function Session() {
 
                         <button
                           onClick={() => {
-                            sessionStorage.setItem("session_id", session.id)
-                            sessionStorage.setItem("session_device", session.Device)
                             handleExtend(session.id, session);
                           }}
                           className="text-2xl addsession-btn active:bg-slate-900 bg-slate-700 py-2 px-4 rounded-lg"
@@ -513,28 +390,10 @@ export default function Session() {
                         </button>
                       </div>
 
-                      <div className="w-1/2 flex justify-end">
-                        <button onClick={() => { handleDrop(); }} className={`text-lg bg-transparent rounded-full`}>
-                          <i className="fa-solid fa-expand"></i>
-                        </button>
-                      </div>
                     </div>
                   </div>
 
-                  <div className="flex w-full justify-center items-center gap-4 pt-10">
-                    <p className="text-sm text-gray-400">Status</p>
-                    <span
-                      className={`${session.Status === "Open"
-                        ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
-                        : session.Status === "Extended"
-                          ? "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
-                          : "bg-gray-800 text-white rounded-full bg-opacity-50 border-2 border-gray-500 font-semibold"
-                        } p-1 w-auto text-center px-4 inline-block`}
-                    >{session.Status}</span>
-                  </div>
-
-
-                  <div className="flex justify-between items-center mb-4 mt-10">
+                  <div className="flex justify-between items-center mb-4 mt-2">
                     <div className="text-left">
                       <p className="text-sm text-gray-400">Date</p>
                       <p className="text-lg font-semibold">{session.Date}</p>
@@ -559,8 +418,14 @@ export default function Session() {
                       <p className="text-lg font-semibold">{session.Out_Time}</p>
                     </div>
                   </div>
+
+                  <div className="w-full h-[40px] flex justify-center items-center bg-slate-950 rounded-full">
+                    <button onClick={() => { handleDrop(session.id); }} className={`w-full text-lg bg-transparent rounded-full`}>
+                      <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                  </div>
                   {
-                    openDrop && (
+                    openDrop === session.id && (
                       <>
                         <div className="flex justify-between items-center mb-4">
                           <div className="text-left">
@@ -593,161 +458,158 @@ export default function Session() {
                       </>
                     )
                   }
-                  {
-                    openSnacks && (
-                      <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                        <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
-                          <h1 className="text-black text-xl"> Add Snacks </h1>
-                          <button
-                            onClick={handleSnacksPopup}
-                            className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
-                          >
-                            X
-                          </button>
-                          <h2 className="text-lg mb-4">Extend Session</h2>
-                          <form onSubmit={(e) => {
-                            e.preventDefault();
-                            console.log("Session", session_id)
-                            const deviceid = sessionStorage.getItem('session_device')
-                            const device_id = devices.filter(
-                              (device) => device.id === deviceid
-                            );
-                            handleSnacksUpdate(device_id, session_id);
-                          }}
-                          >
-                            <div className="mb-4">
-                              <label
-                                className="block text-gray-700 text-sm font-bold mb-2"
-                                htmlFor="snacks"
-                              >
-                                Snacks (Rs.)
-                              </label>
-                              <input
-                                type="text"
-                                value={snacks}
-                                onChange={
-                                  (e) => {
-                                    setsnacks(e.target.value);
-                                  }
-                                }
-                                id="snacks"
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                              />
-                            </div>
-
-                            <button
-                              type="submit"
-                              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                              Add Snacks
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    )
-                  }
-                  {
-                    openExtend && (
-                      <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                        <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
-                          <h1 className="text-black text-xl"> Extend Session </h1>
-                          <button
-                            onClick={handleExtendPopup}
-                            className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
-                          >
-                            X
-                          </button>
-                          <h2 className="text-lg mb-4">Extend Session</h2>
-                          <form >
-                            <div className="mb-4">
-                              <label
-                                className="block text-gray-700 text-sm font-bold mb-2"
-                                htmlFor="minutes"
-                              >
-                                Minutes
-                              </label>
-                              <select
-                                value={minutes}
-                                onChange={
-                                  (e) => {
-                                    setminutes(e.target.value);
-                                  }
-                                }
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                              >
-                                <option value="">-- Select -- </option>
-                                <option value="15">15 Minutes</option>
-                                <option value="30">30 Minutes</option>
-                                <option value="60">60 Minutes</option>
-                              </select>
-                            </div>
-                            <div className="mb-4">
-                              <label
-                                className="block text-gray-700 text-sm font-bold mb-2"
-                                htmlFor="in_time"
-                              >
-                                In Time
-                              </label>
-                              <input
-                                type="time"
-                                value={in_time}
-                                onChange={
-                                  (e) => {
-                                    setin_time(e.target.value);
-                                  }
-                                }
-                                id="in_time"
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                              />
-                            </div>
-                            <div className="mb-4">
-                              <label
-                                className="block text-gray-700 text-sm font-bold mb-2"
-                                htmlFor="out_time"
-                              >
-                                Out Time
-                              </label>
-                              <input
-                                type="time"
-                                value={out_time}
-                                onChange={
-                                  (e) => {
-                                    setout_time(e.target.value);
-                                  }
-                                }
-                                id="out_time"
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                              />
-                            </div>
-
-                            <button
-                              type="submit"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                console.log("Session", session_id)
-                                const deviceid = sessionStorage.getItem('session_device')
-                                const device_id = devices.filter(
-                                  (device) => device.id === deviceid
-                                );
-                                handleExtendSession(device_id, session_id);
-                              }}
-                              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                              Extend
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    )
-                  }
                 </div>
               </div>
             ))}
       </div>
+      {
+        openSnacks && (
+          <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+              <h1 className="text-black text-xl"> Add Snacks </h1>
+              <button
+                onClick={handleSnacksPopup}
+                className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
+              >
+                X
+              </button>
+              <h2 className="text-lg mb-4">Extend Session</h2>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const deviceid = sessionStorage.getItem('session_device')
+                const device_id = devices.filter(
+                  (device) => device.id === deviceid
+                );
+                handleSnacksUpdate(device_id, session_id);
+              }}
+              >
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="snacks"
+                  >
+                    Snacks (Rs.)
+                  </label>
+                  <input
+                    type="text"
+                    value={snacks}
+                    onChange={
+                      (e) => {
+                        setsnacks(e.target.value);
+                      }
+                    }
+                    id="snacks"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Add Snacks
+                </button>
+              </form>
+            </div>
+          </div>
+        )
+      }
+      {
+        openExtend && (
+          <div className="fixed z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+              <h1 className="text-black text-xl"> Extend Session </h1>
+              <button
+                onClick={handleExtendPopup}
+                className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 hover:bg-zinc-300 w-[40px] h-[40px] rounded-full flex justify-center items-center"
+              >
+                X
+              </button>
+              <h2 className="text-lg mb-4">Extend Session</h2>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const deviceid = sessionStorage.getItem('session_device')
+                const device_id = devices.filter(
+                  (device) => device.id === deviceid
+                );
+                handleExtendSession(device_id, session_id);
+              }}>
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="minutes"
+                  >
+                    Minutes
+                  </label>
+                  <select
+                    value={minutes}
+                    onChange={
+                      (e) => {
+                        setminutes(e.target.value);
+                      }
+                    }
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                  >
+                    <option value="">-- Select -- </option>
+                    <option value="15">15 Minutes</option>
+                    <option value="30">30 Minutes</option>
+                    <option value="60">60 Minutes</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="in_time"
+                  >
+                    In Time
+                  </label>
+                  <input
+                    type="time"
+                    value={in_time}
+                    onChange={
+                      (e) => {
+                        setin_time(e.target.value);
+                      }
+                    }
+                    id="in_time"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="out_time"
+                  >
+                    Out Time
+                  </label>
+                  <input
+                    type="time"
+                    value={out_time}
+                    onChange={
+                      (e) => {
+                        setout_time(e.target.value);
+                      }
+                    }
+                    id="out_time"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Extend
+                </button>
+              </form>
+            </div>
+          </div>
+        )
+      }
     </div>
   );
 }

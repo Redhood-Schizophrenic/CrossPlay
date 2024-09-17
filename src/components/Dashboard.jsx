@@ -1,6 +1,7 @@
 "use client";
 
 import { api_url, pocketbase_url } from "@/app/constants/url_consts";
+import { ResponsiveRadialBar } from "@nivo/radial-bar";
 import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [openSession, setOpenSession] = useState('');
   const [extendedSession, setExtendedSession] = useState('');
   const [ClosedSession, setClosedSession] = useState('');
+  const [data, setdata] = useState([]);
 
   useEffect(() => {
     fetchDevice();
@@ -30,25 +32,19 @@ export default function Dashboard() {
     setClosedSession(closed_sessions.length);
     const open_sessions = data1?.items?.filter((session) => session.Status === "Open");
     setOpenSession(open_sessions.length);
-    // const extended_sessions = data1?.items?.filter((session)=> session.Status === "Extended");
-    // setExtendedSession(extended_sessions.length);
-    // const sales_by_device = data1?.items?.filter((session)=> session.Status === "Extended");
-    // setExtendedSession(extended_sessions.length);
-    // const extended_sessions = data1?.items?.filter((session)=> session.Status === "Extended");
-    // setExtendedSession(extended_sessions.length);
-
 
     const result = await fetch(
       `${pocketbase_url}/api/collections/Devices/records`
     );
     const data = await result.json();
     setdevices(data.items);
+    setdata(data1);
+    console.log(data1);
   }
 
   return (
     <div className="text-white">
-      <div>
-
+      <div className='w-full h-1/2'>
       </div>
       <div className="p-4 h-auto" >
         <div className="flex justify-start items-center">
