@@ -8,6 +8,7 @@ export const sales_dashboard = async () => {
 		try {
 
 			const records = await pb.collection('Gaming_Sessions').getFullList();
+			console.log(records);
 			const devices_response = await fetch(`${pocketbase_url}/api/collections/Devices/records`);
 			const devices = await devices_response.json();
 			devices.items.filter((device) => {

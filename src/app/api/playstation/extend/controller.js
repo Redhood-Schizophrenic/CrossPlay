@@ -7,9 +7,10 @@ export const extend_playstation_session = async (data) => {
 	try {
 
 		const session_id = await data['session_id'] || null;
-		let minutes = parseInt(data['minutes']) || 15;
+		let minutes = await data['minutes'] || 15;
 		const in_time = await data['in_time'] || null;
 		const out_time = await data['out_time'] || null;
+		minutes = parseInt(minutes);
 
 		if (in_time === null || out_time === null || minutes === null || session_id === null) {
 			return {
@@ -19,16 +20,27 @@ export const extend_playstation_session = async (data) => {
 			};
 		}
 
-		const session_url = `${pocketbase_url}/api/collections/Gaming_Sessions/records/${session_id}`
-		console.log(session_url);
-		const test = await fetch(session_url)
-		console.log(test)
+		if (minutes === 30 || minutes === 60 || minutes === 15) {
+			const pass = true;
+			pass
+		}
+		else {
+			return {
+				returncode: 400,
+				message: "Minutes extended should be 15, 30, 60 minutes",
+				output: []
+			};
+
+		}
+
 		const record = await pb.collection('Gaming_Sessions').getOne(session_id);
-		console.log(record)
 		const date = record.Date;
-		const no_of_players = record.No_of_Player;
+		let no_of_players = record.No_of_Players || "1";
 		const player_type = record.Player_Type;
-		const old_session_price = record.Session_Price;
+		let old_session_price = record.Session_Price || "0";
+		old_session_price = parseInt(old_session_price);
+		no_of_players = parseInt(no_of_players);
+		console.log(no_of_players)
 
 		// Assuming 'HH:MM' format
 		const [in_hour, in_minute] = await in_time.split(":").map(Number);
@@ -51,7 +63,7 @@ export const extend_playstation_session = async (data) => {
 		// Session Price Calculator
 		if (player_type === "Single") {
 			if (in_time_datetime >= happy_hour_start && out_time_datetime <= happy_hour_end) {
-				if (minutes == 15) {
+				if (minutes === 15) {
 					session_price = old_session_price + 20;
 				}
 				else if (minutes === 30) {
@@ -61,7 +73,7 @@ export const extend_playstation_session = async (data) => {
 					session_price = old_session_price + 75;
 				}
 			} else {
-				if (minutes == 15) {
+				if (minutes === 15) {
 					session_price = old_session_price + 40;
 				}
 				else if (minutes === 30) {
@@ -73,7 +85,7 @@ export const extend_playstation_session = async (data) => {
 			}
 		} else if (player_type === "Multiplayer") {
 			if (in_time_datetime >= happy_hour_start && out_time_datetime <= happy_hour_end) {
-				if (minutes == 15) {
+				if (minutes === 15) {
 					session_price = old_session_price + 10 * no_of_players;
 				}
 				else if (minutes === 30) {
@@ -83,7 +95,7 @@ export const extend_playstation_session = async (data) => {
 					session_price = old_session_price + 35 * no_of_players;
 				}
 			} else {
-				if (minutes == 15) {
+				if (minutes === 15) {
 					session_price = old_session_price + 20 * no_of_players;
 				}
 				else if (minutes === 30) {

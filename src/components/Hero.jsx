@@ -21,7 +21,7 @@ export default function Hero() {
 	const [snacks, setsnacks] = useState();
 	const [time, settime] = useState('00:00');
 	const [date, setDate] = useState('');
-	// const [openTime, setopenTime] = useState(false);
+	const [openTime, setopenTime] = useState(false);
 	const [open1Modal, setopen1Modal] = useState(false);
 
 	const fetchCategory = async () => {
