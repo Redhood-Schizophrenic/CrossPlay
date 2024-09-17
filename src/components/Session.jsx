@@ -22,7 +22,7 @@ export default function Session() {
 
   async function fetchDevice() {
     const session = await fetch(
-      `${pocketbase_url}/api/collections/Gaming_Sessions/records/?perPage=1000000000000000`
+      `${pocketbase_url}/api/collections/Gaming_Sessions/records/?perPage=100000000000`
     );
     const data1 = await session.json();
     setsession(data1.items);

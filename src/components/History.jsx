@@ -13,7 +13,7 @@ export default function History() {
 
   async function fetchDevice() {
     const session = await fetch(
-      `${pocketbase_url}/api/collections/Gaming_Sessions/records`
+      `${pocketbase_url}/api/collections/Gaming_Sessions/records/?perPage=10000000000`
     );
     const data1 = await session.json();
     setsession(data1.items);
@@ -85,9 +85,9 @@ export default function History() {
                     <td className="w-[150px] text-center p-2">
                       <span
                         className={`${session.Status === "Open" ||
-                            session.Status === "Extended"
-                            ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
-                            : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
+                          session.Status === "Extended"
+                          ? "bg-green-400 text-white rounded-full font-semibold bg-opacity-50 border-2 border-green-500"
+                          : "bg-yellow-400 text-white rounded-full bg-opacity-50 border-2 border-yellow-500 font-semibold"
                           } p-1 w-[110px] inline-block`}
                       >
                         {session.Status}

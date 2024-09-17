@@ -20,7 +20,7 @@ export default function Dashboard() {
 
   async function fetchDevice() {
     const session = await fetch(
-      `${pocketbase_url}/api/collections/Gaming_Sessions/records`
+      `${pocketbase_url}/api/collections/Gaming_Sessions/records/?perPage=10000000000`
     );
     const data1 = await session.json();
     setsession(data1.items);
