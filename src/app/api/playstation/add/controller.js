@@ -2,7 +2,7 @@ import { pocketbase_url } from "@/app/constants/url_consts";
 import PocketBase from 'pocketbase';
 const pb = new PocketBase(pocketbase_url);
 
-export const add_playstation_session = async(data) => {
+export const add_playstation_session = async (data) => {
 
 	try {
 
@@ -16,7 +16,7 @@ export const add_playstation_session = async(data) => {
 		const no_of_players = parseInt(data['no_of_players']) || null;
 		const snacks = await data['snacks'] || 0;
 
-		if (customer_name === null || customer_contact === null || date === null || in_time === null || out_time === null || no_of_players === null || device_id === null) {
+		if (customer_name === null || date === null || in_time === null || out_time === null || no_of_players === null || device_id === null) {
 			return {
 				returncode: 400,
 				message: "Missing some input values",
@@ -38,7 +38,7 @@ export const add_playstation_session = async(data) => {
 		const [out_hour, out_minute] = await out_time.split(":").map(Number);
 
 		const in_time_datetime = new Date(date);
-	  	in_time_datetime.setHours(in_hour, in_minute);
+		in_time_datetime.setHours(in_hour, in_minute);
 
 		const out_time_datetime = new Date(date);
 		out_time_datetime.setHours(out_hour, out_minute);
@@ -77,7 +77,7 @@ export const add_playstation_session = async(data) => {
 			"Date": date,
 			"Device": device_id,
 			"Customer_Name": customer_name,
-			"Customer_Contact": customer_contact,
+			"Customer_Contact": customer_contact || "N/A",
 			"Hours": hours,
 			"Minutes": minutes,
 			"In_Time": in_time,

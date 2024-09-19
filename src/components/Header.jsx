@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Header() {
 
 	return (
-		<header className="sticky top-0 w-full h-auto text-white flex flex-col md:flex-row gap-5 justify-between items-center px-8 py-6">
+		<header className="sticky bg-slate-900 bg-opacity-30 backdrop-blur-md top-0 w-full h-auto text-white flex flex-col md:flex-row gap-5 justify-between items-center px-8 py-6">
 			<Link href='/'>
 				<h1 className="cursor-pointer text-2xl font-semibold">
 					Cross

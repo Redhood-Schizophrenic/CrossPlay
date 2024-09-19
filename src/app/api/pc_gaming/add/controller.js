@@ -16,7 +16,7 @@ export const add_pc_gaming_session = async (data) => {
 		const no_of_players = parseInt(data['no_of_players']) || 1;
 		const snacks = await data['snacks'] || 0;
 
-		if (customer_name === null || customer_contact === null || date === null || in_time === null || out_time === null || device_id === null) {
+		if (customer_name === null || date === null || in_time === null || out_time === null || device_id === null) {
 			return {
 				returncode: 400,
 				message: "Missing some input values",
@@ -53,7 +53,7 @@ export const add_pc_gaming_session = async (data) => {
 			"Date": date,
 			"Device": device_id,
 			"Customer_Name": customer_name,
-			"Customer_Contact": customer_contact,
+			"Customer_Contact": customer_contact || "N/A",
 			"Hours": hours,
 			"Minutes": minutes,
 			"In_Time": in_time,

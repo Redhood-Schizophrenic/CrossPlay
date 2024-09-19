@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
+    "@nivo/radial-bar": "^0.87.0",
+    "chart.js": "^4.4.4",
     "next": "14.2.8",
     "pocketbase": "^0.21.5",
     "react": "^18.3.1",

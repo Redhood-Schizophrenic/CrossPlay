@@ -134,7 +134,6 @@ export default function Hero() {
 									>
 										<span className='font-semibold cursor-pointer'>{items.Name}</span>
 									</div>
-									<button className='p-2 px-4 bg-slate-800 active:bg-slate-900 rounded-md'>update</button>
 								</div>
 							)
 						})
@@ -158,7 +157,6 @@ export default function Hero() {
 									>
 										<span className='font-semibold cursor-pointer'>{items.Name}</span>
 									</div>
-									<button className='p-2 px-4 bg-slate-800 active:bg-slate-900 rounded-md'>update</button>
 								</div>
 							)
 						})
@@ -169,15 +167,15 @@ export default function Hero() {
 				openModal && (
 					<div className='w-full h-full fixed z-30 top-0 left-0 flex justify-center items-center bg-black bg-opacity-40 backdrop-blur-md'>
 						<form onSubmit={AddSession} className='w-[40%] h-auto'>
-							<div className='flex justify-center items-center gap-4'>
+							<div className='flex lg:flex-row justify-center items-center gap-4 flex-col'>
 								<div>
 									<div className='w-full inline-flex flex-col justify-center items-start'>
 										<label>Customer name</label>
-										<input type="text" value={customer_name} onChange={(e) => { setcustomer_name(e.target.value) }} className='w-full text-lg text-black p-2 rounded-lg' />
+										<input type="text" placeholder="Enter Name" value={customer_name} onChange={(e) => { setcustomer_name(e.target.value) }} className='w-full text-lg text-black p-2 rounded-lg' />
 									</div>
 									<div className='w-full inline-flex flex-col justify-center items-start'>
 										<label>Customer number</label>
-										<input type="text" minLength={10} maxLength={10} value={customer_number} onChange={(e) => { setcustomer_number(e.target.value) }} className='w-full text-lg text-black p-2 rounded-lg' />
+										<input type="text" placeholder="(Optional)" minLength={10} maxLength={10} value={customer_number} onChange={(e) => { setcustomer_number(e.target.value) }} className='w-full text-lg text-black p-2 rounded-lg' />
 									</div>
 									<div className='w-full inline-flex flex-col justify-center items-start'>
 										<label>Date</label>
